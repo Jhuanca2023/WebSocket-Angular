@@ -1,0 +1,35 @@
+<div class="rooms-container">
+    <div class="rooms-header">
+        <div class="header-text">
+            <h1>Explorar Salas</h1>
+            <p>Únete a una conversación activa o crea la tuya</p>
+        </div>
+        <button class="btn-create">
+            <span>+ Crear Nueva Sala</span>
+        </button>
+    </div>
+
+    <div *ngIf="loading" class="loader-container">
+        <div class="loader"></div>
+    </div>
+
+    <div *ngIf="!loading && rooms.length === 0" class="empty-state">
+        <p>No hay salas activas en este momento.</p>
+    </div>
+
+    <div class="rooms-grid">
+        <div *ngFor="let room of rooms" class="room-card" (click)="enterRoom(room)">
+            <div class="room-card-header">
+                <h3>{{ room.name }}</h3>
+                <span class="badge" [class.private]="room.isPrivate">
+                    {{ room.isPrivate ? '🔒 Privada' : '🌐 Pública' }}
+                </span>
+            </div>
+            <p class="room-desc">{{ room.description || 'Sin descripción' }}</p>
+            <div class="room-card-footer">
+                <span class="host">Host: <strong>{{ room.hostId.name }}</strong></span>
+                <button class="btn-join">Unirse</button>
+            </div>
+        </div>
+    </div>
+</div>

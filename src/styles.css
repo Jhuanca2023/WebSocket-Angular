@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+:root {
+  /* DARK MODE (Default) */
+  --bg-dark: #050505;
+  --bg-card: rgba(20, 20, 25, 0.7);
+  --primary: #9d4edd;
+  --primary-glow: rgba(157, 78, 221, 0.4);
+  --secondary: #5a189a;
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --glass: blur(15px) saturate(180%);
+  --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+  --radius-xl: 30px;
+  --blob-opacity: 0.6;
+}
+
+body.light-mode {
+  /* LIGHT MODE Overrides */
+  --bg-dark: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-glass: 1px solid rgba(0, 0, 0, 0.08);
+  --primary-glow: rgba(157, 78, 221, 0.15);
+  --blob-opacity: 0.4;
+  /* Siguen presentes pero más suaves */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  height: 100vh;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Background Glowing Blobs (Manchas Moradas) */
+.glowing-blob {
+  position: fixed;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+  filter: blur(100px);
+  z-index: -1;
+  pointer-events: none;
+  animation: float-blob 25s infinite alternate ease-in-out;
+  opacity: var(--blob-opacity);
+  transition: opacity 0.4s ease, background 0.4s ease;
+}
+
+.blob-1 {
+  top: -20%;
+  left: -20%;
+}
+
+.blob-2 {
+  bottom: -20%;
+  right: -20%;
+}
+
+.blob-3 {
+  top: 30%;
+  left: 60%;
+  width: 600px;
+  height: 600px;
+}
+
+@keyframes float-blob {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+
+  50% {
+    transform: translate(100px, 50px) scale(1.1) rotate(10deg);
+  }
+
+  100% {
+    transform: translate(-50px, 150px) scale(0.9) rotate(-10deg);
+  }
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass);
+  border: var(--border-glass);
+  border-radius: var(--radius-xl);
+  transition: background 0.4s ease, border 0.4s ease;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.btn-premium {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-premium:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px var(--primary-glow);
+}
+
+.btn-theme {
+  background: var(--bg-card);
+  border: var(--border-glass);
+  color: var(--text-main);
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s;
+  backdrop-filter: var(--glass);
+}
+
+.btn-theme:hover {
+  background: var(--primary);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}

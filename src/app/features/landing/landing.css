@@ -1,0 +1,162 @@
+.landing-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hero */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 5%;
+    gap: 40px;
+}
+
+.hero-text {
+    flex: 1;
+}
+
+.hero-text h1 {
+    font-size: 72px;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.hero-text h1 span {
+    color: var(--primary);
+    text-shadow: 0 0 30px var(--primary-glow);
+}
+
+.hero-text p {
+    font-size: 18px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    max-width: 500px;
+}
+
+.hero-image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-hero-img {
+    width: 100%;
+    max-width: 700px;
+    filter: drop-shadow(0 0 30px var(--primary-glow));
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Services */
+.services-section {
+    padding: 100px 5%;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 48px;
+    margin-bottom: 60px;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.service-card {
+    padding: 40px 30px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.service-card:hover {
+    transform: translateY(-10px) scale(1.02);
+}
+
+.service-img {
+    height: 150px;
+    width: auto;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+}
+
+.service-card h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+/* Pricing */
+.pricing-section {
+    padding: 100px 5% 200px;
+}
+
+.pricing-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.price-card {
+    width: 320px;
+    padding: 50px 40px;
+    text-align: center;
+    position: relative;
+}
+
+.price-card.active {
+    border: 1px solid var(--primary);
+    transform: scale(1.1);
+    box-shadow: 0 0 50px var(--primary-glow);
+}
+
+.plan-name {
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--primary);
+}
+
+.price {
+    font-size: 48px;
+    font-weight: 800;
+    margin: 20px 0;
+}
+
+.price span {
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.features {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 40px;
+    color: var(--text-muted);
+}
+
+.features li {
+    margin-bottom: 10px;
+}
+
+.footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    margin: 50px 20px 20px;
+}

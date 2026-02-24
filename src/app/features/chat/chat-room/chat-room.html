@@ -1,0 +1,144 @@
+<div class="chat-app-wrapper">
+    <!-- Glowing Background -->
+    <div class="glowing-blob blob-1"></div>
+    <div class="glowing-blob blob-2"></div>
+
+    <!-- Main App Layout -->
+    <div class="app-container glass-panel">
+
+        <!-- Left Rail -->
+        <aside class="left-rail">
+            <div class="rail-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    style="width: 24px; color: var(--primary);">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+            </div>
+            <nav class="rail-nav">
+                <div class="rail-item active" title="Chats">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                </div>
+                <div class="rail-item" title="Usuarios">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m12-11a4 4 0 100-8 4 4 0 000 8z" />
+                    </svg>
+                </div>
+                <div class="rail-item" title="Archivos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
+                        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                </div>
+            </nav>
+            <div class="rail-bottom">
+                <div class="rail-item" (click)="themeService.toggleTheme()"
+                    [title]="themeService.darkMode() ? 'Modo Claro' : 'Modo Oscuro'">
+                    <svg *ngIf="themeService.darkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" style="width: 18px;">
+                        <path
+                            d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                    </svg>
+                    <svg *ngIf="!themeService.darkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" style="width: 18px;">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                    </svg>
+                </div>
+                <div class="rail-item" (click)="logout()" title="Cerrar Sesión">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px;">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9" />
+                    </svg>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Room List Split -->
+        <aside class="room-list-sidebar">
+            <div class="sidebar-header">
+                <input type="text" placeholder="Buscar salas..." class="search-input">
+            </div>
+            <div class="rooms-container">
+                <div class="room-item active">
+                    <div class="room-avatar">DG</div>
+                    <div class="room-meta">
+                        <strong>Design Chat</strong>
+                        <span>Active now</span>
+                    </div>
+                </div>
+                <!-- More rooms... -->
+            </div>
+        </aside>
+
+        <!-- Main Chat Content -->
+        <main class="chat-main-area">
+            <header class="section-header">
+                <div class="room-info">
+                    <h2>DESIGN CHAT</h2>
+                    <span class="status">23 miembros • 10 online</span>
+                </div>
+                <div class="header-tools">
+                    <button class="tool-btn">📞</button>
+                    <button class="tool-btn">🔍</button>
+                    <button class="tool-btn">⋮</button>
+                </div>
+            </header>
+
+            <div class="messages-viewport" #scrollMe>
+                <div *ngFor="let msg of messages" class="msg-row" [class.own]="msg.userId === currentUser()?.id">
+                    <div class="msg-card glass-panel">
+                        <div class="sender" *ngIf="msg.userId !== currentUser()?.id">User name</div>
+                        <p>{{ msg.content }}</p>
+                        <span class="time">{{ msg.createdAt | date:'HH:mm' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="input-footer">
+                <div class="input-panel glass-panel">
+                    <button class="action-btn">📎</button>
+                    <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
+                        placeholder="Enviar mensaje premium...">
+                    <div class="input-actions">
+                        <button class="action-btn">🎤</button>
+                        <button class="send-btn-rocket" (click)="sendMessage()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                style="width: 18px; color: white;">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </main>
+
+        <!-- Group Info Right -->
+        <aside class="info-sidebar">
+            <div class="info-header">
+                <h3>GROUP INFO</h3>
+                <button class="close-btn">✕</button>
+            </div>
+
+            <div class="info-content">
+                <section class="media-section">
+                    <div class="section-head">MEDIA <span>285 photos</span></div>
+                    <div class="media-grid-mini">
+                        <div class="media-tile"></div>
+                        <div class="media-tile"></div>
+                    </div>
+                </section>
+
+                <section class="members-section">
+                    <div class="section-head">MEMBERS <span>23</span></div>
+                    <div class="member-compact-list">
+                        <div class="member-compact">
+                            <div class="avatar-mini">TC</div>
+                            <span>Tanisha Combs</span>
+                            <span class="tag">ADMIN</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </aside>
+
+    </div>
+</div>

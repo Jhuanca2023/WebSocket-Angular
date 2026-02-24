@@ -1,0 +1,63 @@
+<div class="split-auth-container">
+    <div class="auth-split-content">
+        <!-- Left Side: Branding/Visual -->
+        <div class="auth-left-brand">
+            <div class="brand-wrapper">
+                <img src="images/visual_element.png" alt="Branding" class="brand-hero-img">
+                <h1 class="brand-title">WEBROCKET<span>.</span></h1>
+                <p class="brand-subtitle">Únete a la mejor comunidad de chat premium</p>
+            </div>
+        </div>
+
+        <!-- Right Side: Register Form -->
+        <div class="auth-right-form">
+            <div class="login-card glass-panel">
+                <div class="form-header">
+                    <h2>Create account</h2>
+                    <p>Get started with your free account today</p>
+                </div>
+
+                <form (submit)="onSubmit()" class="main-login-form">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" [(ngModel)]="user.name" name="name" placeholder="Tu nombre artístico">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email address</label>
+                        <input type="email" [(ngModel)]="user.email" name="email" placeholder="you@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" [(ngModel)]="user.password" name="password"
+                                placeholder="Create a password">
+                        </div>
+                    </div>
+
+                    <div *ngIf="error" class="error-alert">{{ error }}</div>
+
+                    <button type="submit" class="btn-primary-solid" [disabled]="loading">
+                        {{ loading ? 'Creating Account...' : 'Sign Up' }}
+                    </button>
+
+                    <div class="divider">
+                        <span>Or continue with</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button type="button" class="btn-outline-social">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                            Continuar con Google
+                        </button>
+                    </div>
+                </form>
+
+                <div class="form-footer">
+                    Already have an account? <a routerLink="/login">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
