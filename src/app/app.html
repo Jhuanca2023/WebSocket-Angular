@@ -4,8 +4,8 @@
     <div class="glowing-blob blob-2"></div>
     <div class="glowing-blob blob-3"></div>
 
-    <!-- Global Header integrated from the design you like -->
-    <header class="navbar glass-panel">
+    <!-- Global Header -->
+    <header *ngIf="showNavbar" class="navbar glass-panel">
         <div class="logo" routerLink="/">
             <h1 class="logo-text">WEBROCKET<span>.</span></h1>
         </div>
@@ -27,12 +27,28 @@
                     <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
                 </svg>
             </button>
-            <button routerLink="/login" class="btn-ghost">Ingresar</button>
-            <button routerLink="/register" class="btn-premium">Empezar Gratis</button>
+            <ng-container *ngIf="!authService.isAuthenticated()">
+                <button routerLink="/login" class="btn-ghost">Ingresar</button>
+                <button routerLink="/register" class="btn-premium">Empezar Gratis</button>
+            </ng-container>
+            <ng-container *ngIf="authService.isAuthenticated()">
+                <button routerLink="/rooms" class="btn-ghost" style="margin-right: 15px;">Dashboard</button>
+                <div class="user-profile-nav" (click)="uiService.openProfileModal()" title="Mi Perfil">
+                    <div class="nav-avatar">
+                        <img *ngIf="authService.user()?.profileImage" [src]="authService.user()?.profileImage"
+                            class="avatar-img">
+                        <span *ngIf="!authService.user()?.profileImage">{{ authService.user()?.name?.charAt(0) }}</span>
+                    </div>
+                </div>
+                <button (click)="logout()" class="btn-premium" style="margin-left: 15px;">Salir</button>
+            </ng-container>
         </div>
     </header>
 
     <main class="main-content">
         <router-outlet></router-outlet>
     </main>
+
+    <!-- Profile Editor Modal -->
+    <app-profile-editor #profileEditor></app-profile-editor>
 </div>

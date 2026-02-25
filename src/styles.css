@@ -102,7 +102,7 @@ h3 {
 }
 
 .btn-premium {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, #3fc12f, #54b51d);
   color: white;
   border: none;
   padding: 12px 28px;
@@ -111,11 +111,20 @@ h3 {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.hero-text h1 span {
+  color: #e1c220;
+  text-shadow: 0 0 30px var(--primary-glow);
 }
 
 .btn-premium:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 30px var(--primary-glow);
+  box-shadow: 0 15px 30px rgba(63, 193, 47, 0.4);
 }
 
 .btn-theme {
@@ -150,4 +159,16 @@ h3 {
 ::-webkit-scrollbar-thumb {
   background: var(--primary);
   border-radius: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :root {
+    --radius-xl: 20px;
+  }
+
+  .btn-premium {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
 }

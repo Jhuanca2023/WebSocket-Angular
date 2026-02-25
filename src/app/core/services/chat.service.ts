@@ -8,7 +8,9 @@ import { Subject } from 'rxjs';
 export class ChatService {
     private socket: Socket | null = null;
     private messageSubject = new Subject<any>();
+    private memberSubject = new Subject<any[]>();
     messages$ = this.messageSubject.asObservable();
+    members$ = this.memberSubject.asObservable();
 
     connected = signal<boolean>(false);
 
@@ -27,8 +29,25 @@ export class ChatService {
             console.log('✅ Socket conectado');
         });
 
+        this.socket.on('connect_error', (err) => {
+            console.error('❌ Error de conexión socket:', err.message);
+        });
+
         this.socket.on('receive-message', (message: any) => {
             this.messageSubject.next(message);
+        });
+
+        this.socket.on('room-members', (members: any[]) => {
+            this.memberSubject.next(members);
+        });
+
+        this.socket.on('error-msg', (msg: string) => {
+            alert(msg);
+        });
+
+        this.socket.on('kicked', () => {
+            alert('Has sido expulsado de la sala');
+            window.location.href = '/rooms';
         });
 
         this.socket.on('disconnect', () => {
@@ -38,11 +57,35 @@ export class ChatService {
     }
 
     joinRoom(roomId: string) {
-        this.socket?.emit('join-room', roomId);
+        const sendJoin = () => {
+            const userStr = localStorage.getItem('user');
+            const user = userStr ? JSON.parse(userStr) : null;
+            this.socket?.emit('join-room', {
+                roomId,
+                userName: user?.name || 'Usuario',
+                userAvatar: user?.profileImage
+            });
+        };
+
+        if (this.socket?.connected) {
+            sendJoin();
+        } else {
+            this.socket?.once('connect', sendJoin);
+        }
+    }
+
+    kickMember(roomId: string, socketId: string) {
+        this.socket?.emit('kick-member', { roomId, targetSocketId: socketId });
     }
 
     sendMessage(roomId: string, content: string) {
-        this.socket?.emit('send-message', { roomId, content });
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        this.socket?.emit('send-message', {
+            roomId,
+            content,
+            userAvatar: user?.profileImage
+        });
     }
 
     disconnect() {

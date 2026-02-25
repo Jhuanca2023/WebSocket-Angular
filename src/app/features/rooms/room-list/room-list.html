@@ -1,12 +1,37 @@
 <div class="rooms-container">
+    <div class="user-header glass-panel">
+        <div class="user-info-side">
+            <button class="back-btn" routerLink="/" title="Volver al Inicio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width: 20px;">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <div class="user-avatar-big" (click)="uiService.openProfileModal()" title="Editar Perfil">
+                <img *ngIf="authService.user()?.profileImage" [src]="authService.user()?.profileImage"
+                    class="avatar-img-big">
+                <span *ngIf="!authService.user()?.profileImage">{{ authService.user()?.name?.charAt(0) }}</span>
+            </div>
+            <div class="user-details">
+                <h2>Bienvenido, {{ authService.user()?.name }}</h2>
+                <span>Explora o crea tu propio espacio</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-ghost" (click)="logout()">Cerrar Sesión</button>
+            <button class="btn-create" (click)="goToCreateRoom()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width: 18px;">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>Crear Sala</span>
+            </button>
+        </div>
+    </div>
+
     <div class="rooms-header">
         <div class="header-text">
-            <h1>Explorar Salas</h1>
-            <p>Únete a una conversación activa o crea la tuya</p>
+            <h1>Salas Activas</h1>
+            <p>Salas públicas disponibles ahora mismo</p>
         </div>
-        <button class="btn-create">
-            <span>+ Crear Nueva Sala</span>
-        </button>
     </div>
 
     <div *ngIf="loading" class="loader-container">
@@ -22,7 +47,19 @@
             <div class="room-card-header">
                 <h3>{{ room.name }}</h3>
                 <span class="badge" [class.private]="room.isPrivate">
-                    {{ room.isPrivate ? '🔒 Privada' : '🌐 Pública' }}
+                    <svg *ngIf="room.isPrivate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        style="width: 12px; margin-right: 4px;">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" />
+                    </svg>
+                    <svg *ngIf="!room.isPrivate" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" style="width: 12px; margin-right: 4px;">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                        <path
+                            d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+                    </svg>
+                    {{ room.isPrivate ? 'Privada' : 'Pública' }}
                 </span>
             </div>
             <p class="room-desc">{{ room.description || 'Sin descripción' }}</p>

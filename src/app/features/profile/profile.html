@@ -1,0 +1,84 @@
+<div class="profile-modal-overlay" *ngIf="uiService.profileModalOpen()" (click)="close()">
+    <div class="profile-modal-content glass-panel" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+            <h2>Editar imagen</h2>
+            <button class="close-btn-modal" (click)="close()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+
+        <div class="editor-body">
+            <!-- Left Side: Preview Area -->
+            <div class="preview-container">
+                <div class="image-mask">
+                    <img *ngIf="selectedImage()" [src]="selectedImage()" [style.transform]="transformStyle"
+                        class="preview-img">
+                    <div *ngIf="!selectedImage()" class="placeholder-upload" (click)="fileInput.click()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 48px; opacity: 0.3;">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <path d="M21 15l-5-5L5 21" />
+                        </svg>
+                        <p>Haz clic para subir tu foto premium</p>
+                    </div>
+                </div>
+                <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+            </div>
+
+            <!-- Right Side: Controls -->
+            <aside class="editor-controls">
+                <nav class="control-tabs">
+                    <span class="active">Recortar</span>
+                    <span>Filtrar</span>
+                    <span>Ajustar</span>
+                </nav>
+
+                <div class="control-grid">
+                    <button class="icon-tool" (click)="rotateLeft()" title="Rotar izquierda">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <path d="M2.5 2v6h6M2.66 15.57a10 10 0 10.57-8.38" />
+                        </svg>
+                    </button>
+                    <button class="icon-tool" (click)="rotateRight()" title="Rotar derecha">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 11-.57-8.38" />
+                        </svg>
+                    </button>
+                    <button class="icon-tool" (click)="flipH()" title="Voltear horizontal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <path d="M12 2v20M2 12h20" />
+                        </svg>
+                    </button>
+                    <button class="icon-tool" (click)="flipV()" title="Voltear vertical">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <path d="M12 2v20M2 12h20" style="transform: rotate(90deg); transform-origin: center;" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="slider-group">
+                    <label>Zoom</label>
+                    <input type="range" [(ngModel)]="zoom" min="0.5" max="3" step="0.1" class="premium-slider">
+                </div>
+
+                <div class="slider-group">
+                    <label>Enderezar (Rotación Fina)</label>
+                    <input type="range" [(ngModel)]="rotation" min="-180" max="180" step="1" class="premium-slider">
+                </div>
+            </aside>
+        </div>
+
+        <footer class="modal-footer">
+            <button class="btn-ghost" (click)="fileInput.click()">Cambiar foto</button>
+            <div class="spacer"></div>
+            <button class="btn-premium" (click)="save()">Guardar cambios</button>
+        </footer>
+    </div>
+</div>

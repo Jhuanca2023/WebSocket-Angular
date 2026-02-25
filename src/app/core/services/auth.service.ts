@@ -40,6 +40,17 @@ export class AuthService {
         this.router.navigate(['/login']);
     }
 
+    updateProfile(profileData: any) {
+        const token = localStorage.getItem('accessToken');
+        const headers = { Authorization: `Bearer ${token}` };
+        return this.http.put(`${this.apiUrl}/update-profile`, profileData, { headers }).pipe(
+            tap((res: any) => {
+                localStorage.setItem('user', JSON.stringify(res.user));
+                this.user.set(res.user);
+            })
+        );
+    }
+
     private checkLocalStorage() {
         const userStr = localStorage.getItem('user');
         if (userStr) {
