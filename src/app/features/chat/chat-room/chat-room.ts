@@ -18,123 +18,142 @@ import { Subscription } from 'rxjs';
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
   public themeService = inject(ThemeService);
+  public uiService = inject(UiService);
+  public authService = inject(AuthService);
+  currentUser = inject(AuthService).user;
+
   roomId = '';
-  room: any = null;
+  room = signal<any>(null);
   messages: any[] = [];
   members: any[] = [];
   newMessage = '';
-  currentUser = inject(AuthService).user;
-  public authService = inject(AuthService);
-  public uiService = inject(UiService);
   showInfo = true;
 
-  // Permissions
+  // Host check - compare IDs as strings robustly
   isHost = computed(() => {
     const user = this.currentUser();
-    return user && this.room && this.room.hostId._id === user.id;
+    const room = this.room();
+    if (!user || !room) return false;
+    const hostId = room.hostId?._id || room.hostId;
+    const isHost = String(hostId) === String(user.id);
+    console.log(`🔍 [CheckHost] Host: ${hostId} | Me: ${user.id} | Result: ${isHost}`);
+    return isHost;
   });
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private chatService = inject(ChatService);
+  public chatService = inject(ChatService);
   private roomService = inject(RoomService);
   private subs = new Subscription();
 
+  checkIsHost(memberId: string): boolean {
+    const room = this.room();
+    if (!room) return false;
+    const hostId = room.hostId?._id || room.hostId;
+    return String(hostId) === String(memberId);
+  }
+
   ngOnInit() {
     this.roomId = this.route.snapshot.paramMap.get('id') || '';
+    if (!this.roomId) return;
 
-    if (this.roomId) {
-      this.loadRoomInfo();
-      this.chatService.connect();
+    this.loadRoomInfo();
 
-      this.subs.add(
-        this.chatService.messages$.subscribe((msg: any) => {
-          if (msg.roomId === this.roomId) {
-            this.messages.push(msg);
-            this.scrollToBottom();
-          }
-        })
-      );
+    // Connect socket fresh for this user
+    this.chatService.connect();
 
-      this.subs.add(
-        this.chatService.members$.subscribe((members: any[]) => {
-          this.members = members;
-        })
-      );
+    // Subscribe to incoming messages
+    this.subs.add(
+      this.chatService.messages$.subscribe((msg: any) => {
+        if (msg.roomId === this.roomId) {
+          this.messages.push(msg);
+          this.scrollToBottom();
+        }
+      })
+    );
 
-      // Join room with full info delayed slightly to ensure socket is connected
-      setTimeout(() => {
-        this.chatService.joinRoom(this.roomId);
-      }, 500);
-    }
+    // Subscribe to member list updates
+    this.subs.add(
+      this.chatService.members$.subscribe((members: any[]) => {
+        this.members = members;
+      })
+    );
+
+    // Join the room (waits for connection internally)
+    this.chatService.joinRoom(this.roomId);
   }
 
   loadRoomInfo() {
-    this.roomService.getRoomById(this.roomId).subscribe((room: any) => {
-      this.room = room;
+    this.roomService.getRoomById(this.roomId).subscribe({
+      next: (room: any) => {
+        this.room.set(room);
+        console.log('🏠 Sala cargada:', room.name, '| hostId:', room.hostId?._id || room.hostId);
+      },
+      error: (err) => {
+        console.error('Error al cargar sala:', err);
+        if (err.status === 404) {
+          alert('Esta sala no existe o fue eliminada.');
+          this.router.navigate(['/rooms']);
+        }
+      }
     });
   }
 
   sendMessage() {
     if (!this.newMessage.trim()) return;
-    this.chatService.sendMessage(this.roomId, this.newMessage);
+    this.chatService.sendMessage(this.roomId, this.newMessage.trim());
     this.newMessage = '';
-    this.scrollToBottom();
   }
 
-  // Management features
   deleteRoom() {
-    if (confirm('¿Estás seguro de que quieres eliminar esta sala permanentemente?')) {
-      this.roomService.deleteRoom(this.roomId).subscribe(() => {
-        this.router.navigate(['/rooms']);
+    if (!this.isHost()) return;
+    if (confirm('¿Eliminar esta sala permanentemente?')) {
+      this.roomService.deleteRoom(this.roomId).subscribe({
+        next: () => this.router.navigate(['/rooms']),
+        error: (err) => alert('Error al eliminar: ' + err.error?.message)
       });
     }
   }
 
   renameRoom() {
-    const newName = prompt('Ingrese el nuevo nombre de la sala:', this.room.name);
-    if (newName && newName.trim()) {
-      this.roomService.updateRoom(this.roomId, { name: newName }).subscribe(() => {
-        this.loadRoomInfo();
+    if (!this.isHost()) return;
+    const newName = prompt('Nuevo nombre de la sala:', this.room()?.name);
+    if (newName?.trim()) {
+      this.roomService.updateRoom(this.roomId, { name: newName.trim() }).subscribe({
+        next: () => this.loadRoomInfo(),
+        error: (err) => alert('Error al renombrar: ' + err.error?.message)
       });
     }
   }
 
   kickMember(member: any) {
+    if (!this.isHost()) return;
     if (confirm(`¿Expulsar a ${member.name}?`)) {
       this.chatService.kickMember(this.roomId, member.socketId);
     }
   }
 
   copyUrl() {
-    navigator.clipboard.writeText(window.location.href);
-    alert('URL de la sala copiada al portapapeles');
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('✅ URL copiada al portapapeles');
+    });
   }
 
-  // Existing features
-  startCall() {
-    alert('Iniciando llamada premium con cifrado de punto a punto...');
-  }
+  startCall() { alert('Llamada premium próximamente...'); }
+  uploadFile() { alert('Selector de archivos próximamente...'); }
+  startRecording() { alert('Grabación de audio próximamente...'); }
 
   toggleSearch() {
     const input = document.querySelector('.search-input') as HTMLInputElement;
     if (input) input.focus();
   }
 
-  uploadFile() {
-    alert('Abriendo selector de archivos premium...');
-  }
-
-  startRecording() {
-    alert('Grabando audio de alta fidelidad...');
+  toggleInfo() {
+    this.showInfo = !this.showInfo;
   }
 
   goDashboard() {
     this.router.navigate(['/rooms']);
-  }
-
-  toggleInfo() {
-    this.showInfo = !this.showInfo;
   }
 
   logout() {
@@ -145,11 +164,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       const viewport = document.querySelector('.messages-viewport');
       if (viewport) viewport.scrollTop = viewport.scrollHeight;
-    }, 100);
+    }, 80);
   }
 
   ngOnDestroy() {
-    this.chatService.disconnect();
     this.subs.unsubscribe();
+    this.chatService.disconnect();
   }
 }

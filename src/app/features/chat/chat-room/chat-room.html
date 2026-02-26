@@ -58,10 +58,10 @@
                 <input type="text" placeholder="Buscar salas..." class="search-input">
             </div>
             <div class="rooms-container">
-                <div class="room-item active" *ngIf="room">
-                    <div class="room-avatar">{{ room.name.charAt(0) }}</div>
+                <div class="room-item active" *ngIf="room()">
+                    <div class="room-avatar">{{ room().name.charAt(0) }}</div>
                     <div class="room-meta">
-                        <strong>{{ room.name }}</strong>
+                        <strong>{{ room().name }}</strong>
                         <span>Activa ahora</span>
                     </div>
                 </div>
@@ -72,9 +72,13 @@
         <main class="chat-main-area">
             <header class="section-header">
                 <div class="room-info">
-                    <h2 class="dynamic-name">{{ room?.name || 'Cargando sala...' }}</h2>
-                    <span class="status">{{ room?.isPrivate ? 'Sala Privada' : 'Sala Pública' }} • {{ members.length }}
-                        online</span>
+                    <h2 class="dynamic-name">{{ room()?.name || 'Cargando sala...' }}</h2>
+                    <span class="status">
+                        <span class="conn-dot" [class.online]="chatService.connected()"
+                            [class.offline]="!chatService.connected()"></span>
+                        {{ chatService.connected() ? 'Conectado' : 'Desconectado' }} •
+                        {{ room()?.isPrivate ? 'Sala Privada' : 'Sala Pública' }} • {{ members.length }} online
+                    </span>
                 </div>
                 <div class="header-tools">
                     <button class="tool-btn" (click)="startCall()" title="Llamada">
@@ -219,7 +223,7 @@
                             </div>
                             <div class="member-name-box">
                                 <span>{{ member.name }}</span>
-                                <span class="tag" *ngIf="room && member.userId === room.hostId._id">HOST</span>
+                                <span class="tag" *ngIf="checkIsHost(member.userId)">HOST</span>
                             </div>
                             <button class="kick-btn"
                                 *ngIf="isHost() && member.userId !== (currentUser() ? currentUser().id : null)"
