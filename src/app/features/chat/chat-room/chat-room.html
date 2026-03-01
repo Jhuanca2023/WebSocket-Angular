@@ -1,144 +1,242 @@
-<div class="chat-app-wrapper">
-    <!-- Glowing Background -->
-    <div class="glowing-blob blob-1"></div>
-    <div class="glowing-blob blob-2"></div>
+<div class="chat-layout" [class.dark-theme]="themeService.darkMode()">
+    <!-- Top Progress Line -->
+    <div class="top-line"></div>
 
-    <!-- Main App Layout -->
-    <div class="app-container glass-panel">
-
-        <!-- Left Rail -->
-        <aside class="left-rail">
-            <div class="rail-logo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                    style="width: 24px; color: var(--primary);">
+    <aside class="left-rail glass-panel">
+        <div class="rail-top">
+            <div class="logo-box" (click)="goDashboard()" title="Dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="vibe-logo">
                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
             </div>
             <nav class="rail-nav">
-                <div class="rail-item active" title="Chats">
+                <button class="rail-btn active" title="Salas">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
-                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                        <path
+                            d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" />
                     </svg>
-                </div>
-                <div class="rail-item" title="Usuarios">
+                </button>
+                <button class="rail-btn" (click)="uiService.openProfileModal()" title="Perfil">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
-                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m12-11a4 4 0 100-8 4 4 0 000 8z" />
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
                     </svg>
-                </div>
-                <div class="rail-item" title="Archivos">
+                </button>
+                <button class="rail-btn" title="Archivos">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
-                        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
                     </svg>
-                </div>
+                </button>
             </nav>
             <div class="rail-bottom">
                 <div class="rail-item" (click)="themeService.toggleTheme()"
-                    [title]="themeService.darkMode() ? 'Modo Claro' : 'Modo Oscuro'">
-                    <svg *ngIf="themeService.darkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" style="width: 18px;">
-                        <path
-                            d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-                    </svg>
+                    [title]="themeService.darkMode() ? 'Modo Luz' : 'Modo Oscuro'">
                     <svg *ngIf="!themeService.darkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" style="width: 18px;">
+                        stroke-width="2" style="width: 20px;">
+                        <circle cx="12" cy="12" r="5" />
+                        <path
+                            d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M17.66 6.34l1.42-1.42" />
+                    </svg>
+                    <svg *ngIf="themeService.darkMode()" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" style="width: 20px;">
                         <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
                     </svg>
                 </div>
                 <div class="rail-item" (click)="logout()" title="Cerrar Sesión">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px;">
-                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
                     </svg>
                 </div>
             </div>
-        </aside>
+        </div>
+    </aside>
 
-        <!-- Room List Split -->
+    <div class="chat-container">
+        <!-- Room List Sidebar -->
         <aside class="room-list-sidebar">
             <div class="sidebar-header">
                 <input type="text" placeholder="Buscar salas..." class="search-input">
             </div>
             <div class="rooms-container">
-                <div class="room-item active">
-                    <div class="room-avatar">DG</div>
+                <div class="room-item active" *ngIf="room()">
+                    <div class="room-avatar">{{ room().name.charAt(0) }}</div>
                     <div class="room-meta">
-                        <strong>Design Chat</strong>
-                        <span>Active now</span>
+                        <strong>{{ room().name }}</strong>
+                        <span>Activa ahora</span>
                     </div>
                 </div>
-                <!-- More rooms... -->
             </div>
         </aside>
 
-        <!-- Main Chat Content -->
+        <!-- Main Chat Area -->
         <main class="chat-main-area">
             <header class="section-header">
                 <div class="room-info">
-                    <h2>DESIGN CHAT</h2>
-                    <span class="status">23 miembros • 10 online</span>
+                    <h2 class="dynamic-name">{{ room()?.name || 'Cargando sala...' }}</h2>
+                    <span class="status">
+                        <span class="conn-dot" [class.online]="chatService.connected()"
+                            [class.offline]="!chatService.connected()"></span>
+                        {{ chatService.connected() ? 'Conectado' : 'Desconectado' }} •
+                        {{ room()?.isPrivate ? 'Sala Privada' : 'Sala Pública' }} • {{ members.length }} online
+                    </span>
                 </div>
                 <div class="header-tools">
-                    <button class="tool-btn">📞</button>
-                    <button class="tool-btn">🔍</button>
-                    <button class="tool-btn">⋮</button>
+                    <button class="tool-btn" (click)="startCall()" title="Llamada">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <path
+                                d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.13 12a19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+                        </svg>
+                    </button>
+                    <button class="tool-btn" (click)="toggleSearch()" title="Buscar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                    </button>
+                    <button class="tool-btn" (click)="toggleInfo()" title="Info de sala">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <circle cx="12" cy="12" r="1" />
+                            <circle cx="12" cy="5" r="1" />
+                            <circle cx="12" cy="19" r="1" />
+                        </svg>
+                    </button>
                 </div>
             </header>
 
-            <div class="messages-viewport" #scrollMe>
-                <div *ngFor="let msg of messages" class="msg-row" [class.own]="msg.userId === currentUser()?.id">
-                    <div class="msg-card glass-panel">
-                        <div class="sender" *ngIf="msg.userId !== currentUser()?.id">User name</div>
-                        <p>{{ msg.content }}</p>
-                        <span class="time">{{ msg.createdAt | date:'HH:mm' }}</span>
+            <div class="messages-viewport">
+                <!-- Empty state -->
+                <div *ngIf="messages.length === 0" class="empty-chat">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                            style="width: 64px;">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                        </svg>
+                    </div>
+                    <p>No hay mensajes todavía. ¡Sé el primero en saludar!</p>
+                </div>
+
+                <!-- Messages loop -->
+                <div *ngFor="let msg of messages">
+                    <!-- System notification -->
+                    <div *ngIf="msg.userId === 'system'" class="system-msg">
+                        <span>{{ msg.content }}</span>
+                    </div>
+
+                    <!-- Regular message -->
+                    <div *ngIf="msg.userId !== 'system'" class="msg-row"
+                        [class.own]="msg.userId === (currentUser() ? currentUser().id : null)">
+
+                        <!-- Other user avatar (left) -->
+                        <div class="msg-avatar" *ngIf="msg.userId !== (currentUser() ? currentUser().id : null)">
+                            <img *ngIf="msg.userAvatar" [src]="msg.userAvatar" class="mini-avatar">
+                            <div *ngIf="!msg.userAvatar" class="avatar-letter">{{ msg.userName?.charAt(0) || 'U' }}
+                            </div>
+                        </div>
+
+                        <!-- Message bubble -->
+                        <div class="msg-card glass-panel">
+                            <div class="sender" *ngIf="msg.userId !== (currentUser() ? currentUser().id : null)">
+                                {{ msg.userName || 'Usuario' }}
+                            </div>
+                            <p>{{ msg.content }}</p>
+                            <span class="time">{{ msg.createdAt | date:'HH:mm' }}</span>
+                        </div>
+
+                        <!-- Own avatar (right) -->
+                        <div class="msg-avatar own" *ngIf="msg.userId === (currentUser() ? currentUser().id : null)">
+                            <img *ngIf="currentUser()?.profileImage" [src]="currentUser()?.profileImage"
+                                class="mini-avatar">
+                            <div *ngIf="!currentUser()?.profileImage" class="avatar-letter">
+                                {{ currentUser()?.name?.charAt(0) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <footer class="input-footer">
-                <div class="input-panel glass-panel">
-                    <button class="action-btn">📎</button>
+            <!-- Message Input Footer -->
+            <footer class="chat-footer">
+                <div class="input-container glass-panel">
+                    <button class="action-btn" (click)="uploadFile()" title="Adjuntar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <path
+                                d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+                        </svg>
+                    </button>
                     <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
-                        placeholder="Enviar mensaje premium...">
-                    <div class="input-actions">
-                        <button class="action-btn">🎤</button>
-                        <button class="send-btn-rocket" (click)="sendMessage()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                style="width: 18px; color: white;">
-                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                            </svg>
-                        </button>
-                    </div>
+                        placeholder="Enviar mensaje premium..." class="msg-input">
+                    <button class="action-btn" (click)="startRecording()" title="Grabar audio">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 20px;">
+                            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                            <path d="M19 10v1a7 7 0 01-14 0v-1M12 19v4M8 23h8" />
+                        </svg>
+                    </button>
+                    <button class="send-btn" (click)="sendMessage()" title="Enviar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            style="width: 20px;">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                        </svg>
+                    </button>
                 </div>
             </footer>
         </main>
 
-        <!-- Group Info Right -->
-        <aside class="info-sidebar">
+        <!-- Info Sidebar (right) -->
+        <aside class="info-sidebar" *ngIf="showInfo">
             <div class="info-header">
-                <h3>GROUP INFO</h3>
-                <button class="close-btn">✕</button>
+                <h3>INFO DE SALA</h3>
+                <button class="close-btn" (click)="toggleInfo()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px;">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             <div class="info-content">
-                <section class="media-section">
-                    <div class="section-head">MEDIA <span>285 photos</span></div>
-                    <div class="media-grid-mini">
-                        <div class="media-tile"></div>
-                        <div class="media-tile"></div>
+                <!-- Host management -->
+                <section class="admin-section" *ngIf="isHost()">
+                    <div class="section-head">ACCIONES DE HOST</div>
+                    <div class="admin-tools">
+                        <button class="admin-btn" (click)="renameRoom()">Editar Nombre</button>
+                        <button class="admin-btn" (click)="copyUrl()">Compartir URL</button>
+                        <button class="admin-btn danger" (click)="deleteRoom()">Eliminar Sala</button>
                     </div>
                 </section>
 
+                <section class="media-section">
+                    <div class="section-head">MEDIA <span>0 fotos</span></div>
+                    <div class="empty-media-placeholder">No hay archivos compartidos</div>
+                </section>
+
                 <section class="members-section">
-                    <div class="section-head">MEMBERS <span>23</span></div>
+                    <div class="section-head">MIEMBROS <span>{{ members.length }}</span></div>
                     <div class="member-compact-list">
-                        <div class="member-compact">
-                            <div class="avatar-mini">TC</div>
-                            <span>Tanisha Combs</span>
-                            <span class="tag">ADMIN</span>
+                        <div class="member-compact" *ngFor="let member of members">
+                            <div class="avatar-mini">
+                                <img *ngIf="member.avatar" [src]="member.avatar" class="mini-avatar">
+                                <span *ngIf="!member.avatar">{{ member.name.charAt(0) }}</span>
+                            </div>
+                            <div class="member-name-box">
+                                <span>{{ member.name }}</span>
+                                <span class="tag" *ngIf="checkIsHost(member.userId)">HOST</span>
+                            </div>
+                            <button class="kick-btn"
+                                *ngIf="isHost() && member.userId !== (currentUser() ? currentUser().id : null)"
+                                (click)="kickMember(member)" title="Expulsar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    style="width: 14px;">
+                                    <path d="M18 6L6 18M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </section>
             </div>
         </aside>
-
     </div>
 </div>

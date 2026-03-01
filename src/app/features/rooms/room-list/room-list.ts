@@ -2,6 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { RoomService } from '../../../core/services/room.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { UiService } from '../../../core/services/ui.service';
 
 @Component({
   selector: 'app-room-list',
@@ -16,9 +18,15 @@ export class RoomListComponent implements OnInit {
 
   private roomService = inject(RoomService);
   private router = inject(Router);
+  public authService = inject(AuthService);
+  public uiService = inject(UiService);
 
   ngOnInit() {
     this.loadRooms();
+  }
+
+  logout() {
+    this.authService.logout();
   }
 
   loadRooms() {
@@ -35,5 +43,9 @@ export class RoomListComponent implements OnInit {
 
   enterRoom(room: any) {
     this.router.navigate(['/chat', room._id]);
+  }
+
+  goToCreateRoom() {
+    this.router.navigate(['/rooms/create']);
   }
 }

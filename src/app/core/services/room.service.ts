@@ -25,4 +25,12 @@ export class RoomService {
     getRoomById(id: string) {
         return this.http.get(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
     }
+
+    updateRoom(id: string, roomData: any) {
+        return this.http.put(`${this.apiUrl}/${id}`, roomData, { headers: this.getHeaders() });
+    }
+
+    deleteRoom(id: string) {
+        return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    }
 }
