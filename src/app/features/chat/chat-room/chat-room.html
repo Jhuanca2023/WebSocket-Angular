@@ -1,4 +1,18 @@
 <div class="chat-layout" [class.dark-theme]="themeService.darkMode()">
+    <!-- Global Loading Overlay -->
+    <div class="global-loading" *ngIf="uiService.loading()">
+        <div class="spinner"></div>
+        <span>Procesando...</span>
+    </div>
+
+    <!-- Screen Share Overlay Overlay -->
+    <div class="screen-preview-overlay" *ngIf="isSharingScreen">
+        <div class="preview-header">
+            <span>🔴 Compartiendo pantalla</span>
+            <button class="stop-btn" (click)="stopScreenShare()">Detener</button>
+        </div>
+        <video #screenPreview autoplay [srcObject]="screenStream" class="preview-video"></video>
+    </div>
     <!-- Top Progress Line -->
     <div class="top-line"></div>
 
@@ -58,11 +72,39 @@
                 <input type="text" placeholder="Buscar salas..." class="search-input">
             </div>
             <div class="rooms-container">
-                <div class="room-item active" *ngIf="room()">
-                    <div class="room-avatar">{{ room().name.charAt(0) }}</div>
+                <div class="room-item" *ngIf="rootRoom()"
+                    (click)="router.navigate(['/chat', rootRoom()._id || rootRoom().id])"
+                    [class.active]="(rootRoom()._id || rootRoom().id) === roomId">
+                    <div class="room-avatar">
+                        <img *ngIf="rootRoom().imageUrl" [src]="rootRoom().imageUrl" class="room-img">
+                        <span *ngIf="!rootRoom().imageUrl">{{ rootRoom().name.charAt(0) }}</span>
+                    </div>
                     <div class="room-meta">
-                        <strong>{{ room().name }}</strong>
-                        <span>Activa ahora</span>
+                        <strong>{{ rootRoom().name }}</strong>
+                        <span class="online-count">{{ members.length }} miembros</span>
+                    </div>
+                </div>
+
+                <!-- Sub-groups Section -->
+                <div class="subgroups-header" *ngIf="rootRoom()">
+                    <span>SUB-GRUPOS</span>
+                    <button class="add-sub-btn" *ngIf="isHost()" (click)="createSubGroup()" title="Crear sub-grupo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 14px;">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="room-item subgroup" *ngFor="let sg of subGroups"
+                    [class.active]="(sg._id || sg.id) === roomId"
+                    (click)="router.navigate(['/chat', sg._id || sg.id])" style="cursor: pointer;">
+                    <div class="room-avatar mini">
+                        <span>#</span>
+                    </div>
+                    <div class="room-meta">
+                        <strong>{{ sg.name }}</strong>
+                        <span>Sub-sala</span>
                     </div>
                 </div>
             </div>
@@ -106,7 +148,7 @@
                 </div>
             </header>
 
-            <div class="messages-viewport">
+            <div class="messages-viewport" (scroll)="onMessagesScroll($event)">
                 <!-- Empty state -->
                 <div *ngIf="messages.length === 0" class="empty-chat">
                     <div class="empty-icon">
@@ -130,27 +172,94 @@
                         [class.own]="msg.userId === (currentUser() ? currentUser().id : null)">
 
                         <!-- Other user avatar (left) -->
-                        <div class="msg-avatar" *ngIf="msg.userId !== (currentUser() ? currentUser().id : null)">
+                        <div class="msg-avatar" *ngIf="msg.userId !== (currentUser() ? currentUser().id : null)"
+                            (click)="viewMember({ userId: msg.userId, name: msg.userName, avatar: msg.userAvatar })">
                             <img *ngIf="msg.userAvatar" [src]="msg.userAvatar" class="mini-avatar">
                             <div *ngIf="!msg.userAvatar" class="avatar-letter">{{ msg.userName?.charAt(0) || 'U' }}
                             </div>
                         </div>
 
                         <!-- Message bubble -->
-                        <div class="msg-card glass-panel">
+                        <div class="msg-card glass-panel"
+                            (contextmenu)="$event.preventDefault(); toggleMessageMenu(msg._id || msg.id)">
+                            <div class="private-badge" *ngIf="msg.recipientId">PRIVADO</div>
+
+                            <!-- Message Actions Arrow (Senior UI) -->
+                            <button class="msg-menu-btn"
+                                (click)="toggleMessageMenu(msg._id || msg.id); $event.stopPropagation()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    style="width: 14px;">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            </button>
+
                             <div class="sender" *ngIf="msg.userId !== (currentUser() ? currentUser().id : null)">
                                 {{ msg.userName || 'Usuario' }}
                             </div>
-                            <p>{{ msg.content }}</p>
-                            <span class="time">{{ msg.createdAt | date:'HH:mm' }}</span>
+
+                            <!-- TEXT MESSAGE -->
+                            <p *ngIf="msg.type === 'TEXT' || !msg.type">{{ msg.content }}</p>
+
+                            <!-- FILE MESSAGE -->
+                            <div class="file-message" *ngIf="msg.type === 'FILE'">
+                                <img *ngIf="isImageUrl(msg.fileUrl)" [src]="msg.fileUrl" class="msg-image">
+                                <a [href]="msg.fileUrl" target="_blank" class="download-link">
+                                    {{ msg.content }}
+                                </a>
+                            </div>
+
+                            <!-- AUDIO MESSAGE -->
+                            <div class="audio-message" *ngIf="msg.type === 'AUDIO'">
+                                <audio controls [src]="msg.fileUrl"></audio>
+                            </div>
+
+                            <!-- SCREEN SHARE MESSAGE -->
+                            <div class="screen-share-msg" *ngIf="msg.type === 'SCREEN_SHARE'">
+                                <div class="screen-icon">🖥️</div>
+                                <span>{{ msg.content }}</span>
+                            </div>
+                            <div class="screen-share-preview" *ngIf="msg.type === 'SCREEN_SHARE' && msg.fileUrl">
+                                <img [src]="msg.fileUrl" class="msg-image">
+                            </div>
+
+                            <!-- Reaction Selection Bar (WhatsApp Style Exact) -->
+                            <div class="reaction-bar glass-panel" *ngIf="activeMessageMenu === (msg._id || msg.id)">
+                                <div class="reaction-list">
+                                    <span class="reaction-emoji" (click)="addReaction(msg, '👍')">👍</span>
+                                    <span class="reaction-emoji" (click)="addReaction(msg, '❤️')">❤️</span>
+                                    <span class="reaction-emoji" (click)="addReaction(msg, '😂')">😂</span>
+                                    <span class="reaction-emoji" (click)="addReaction(msg, '😮')">😮</span>
+                                    <span class="reaction-emoji" (click)="addReaction(msg, '😢')">😢</span>
+                                    <span class="reaction-emoji" (click)="addReaction(msg, '🙏')">🙏</span>
+                                    <button class="add-reaction-plus" (click)="openEmojiPicker(msg)">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                            style="width: 14px;">
+                                            <path d="M12 5v14M5 12h14" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- List of Reactions on Message -->
+                            <div class="message-reactions" *ngIf="msg.reactions?.length > 0">
+                                <div class="reaction-tag" *ngFor="let r of msg.reactions">
+                                    {{ r.emoji }}
+                                </div>
+                            </div>
+
+                            <div class="msg-meta">
+                                <span class="time">{{ msg.createdAt | date:'HH:mm' }}</span>
+                                <span class="checks"
+                                    *ngIf="msg.userId === (currentUser() ? currentUser().id : null)">✓✓</span>
+                            </div>
                         </div>
 
                         <!-- Own avatar (right) -->
-                        <div class="msg-avatar own" *ngIf="msg.userId === (currentUser() ? currentUser().id : null)">
-                            <img *ngIf="currentUser()?.profileImage" [src]="currentUser()?.profileImage"
-                                class="mini-avatar">
-                            <div *ngIf="!currentUser()?.profileImage" class="avatar-letter">
-                                {{ currentUser()?.name?.charAt(0) }}
+                        <div class="msg-avatar own" *ngIf="msg.userId === (currentUser() ? currentUser().id : null)"
+                            (click)="viewMember({ userId: msg.userId, name: msg.userName, avatar: msg.userAvatar })">
+                            <img *ngIf="msg.userAvatar" [src]="msg.userAvatar" class="mini-avatar">
+                            <div *ngIf="!msg.userAvatar" class="avatar-letter">
+                                {{ msg.userName ? msg.userName.charAt(0) : 'U' }}
                             </div>
                         </div>
                     </div>
@@ -160,30 +269,62 @@
             <!-- Message Input Footer -->
             <footer class="chat-footer">
                 <div class="input-container glass-panel">
-                    <button class="action-btn" (click)="uploadFile()" title="Adjuntar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            style="width: 20px;">
-                            <path
-                                d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
-                        </svg>
-                    </button>
+                    <div class="input-actions-left">
+                        <button class="action-btn" (click)="uploadFile()" title="Adjuntar archivo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width: 20px;">
+                                <path
+                                    d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+                            </svg>
+                        </button>
+                        <button class="action-btn" (click)="shareScreen()" title="Compartir pantalla">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width: 20px;">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                <path d="M8 21h8m-4-4v4" />
+                            </svg>
+                        </button>
+                    </div>
+
                     <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
-                        placeholder="Enviar mensaje premium..." class="msg-input">
-                    <button class="action-btn" (click)="startRecording()" title="Grabar audio">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            style="width: 20px;">
-                            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-                            <path d="M19 10v1a7 7 0 01-14 0v-1M12 19v4M8 23h8" />
-                        </svg>
-                    </button>
-                    <button class="send-btn" (click)="sendMessage()" title="Enviar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                            style="width: 20px;">
-                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                        </svg>
-                    </button>
+                        placeholder="Escribe un mensaje..." class="msg-input">
+
+                    <div class="input-actions-right">
+                        <button class="action-btn" (click)="openEmojiPicker()" title="Emojis">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width: 20px;">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" />
+                            </svg>
+                        </button>
+                        <button class="action-btn" [class.recording]="isRecording" (click)="startRecording()"
+                            [title]="isRecording ? 'Detener audio' : 'Grabar audio'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width: 20px;">
+                                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                                <path d="M19 10v1a7 7 0 01-14 0v-1M12 19v4M8 23h8" />
+                            </svg>
+                        </button>
+                        <button class="send-btn" (click)="sendMessage()" title="Enviar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                style="width: 20px;">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="emoji-picker glass-panel" *ngIf="showEmojiPicker">
+                    <emoji-mart set="apple" (emojiSelect)="onEmojiSelected($event)"></emoji-mart>
+                </div>
+                <div class="recording-indicator" *ngIf="isRecording">
+                    <span class="dot"></span>
+                    Grabando audio... {{ recordingDuration }}s
                 </div>
             </footer>
+            <button class="scroll-down-btn" *ngIf="showScrollDown" (click)="scrollToBottom()"
+                title="Ir al último mensaje">
+                ↓
+            </button>
         </main>
 
         <!-- Info Sidebar (right) -->
@@ -198,6 +339,21 @@
             </div>
 
             <div class="info-content">
+                <section class="member-profile" *ngIf="selectedMember">
+                    <div class="section-head">INFO DE USUARIO</div>
+                    <div class="profile-card">
+                        <div class="avatar-mini large">
+                            <img *ngIf="selectedMember.avatar" [src]="selectedMember.avatar" class="mini-avatar">
+                            <span *ngIf="!selectedMember.avatar">{{ selectedMember.name?.charAt(0) }}</span>
+                        </div>
+                        <div class="profile-details">
+                            <strong>{{ selectedMember.name || 'Usuario' }}</strong>
+                            <span>{{ selectedMember.email || 'Correo no disponible' }}</span>
+                            <span class="muted">ID: {{ selectedMember.userId }}</span>
+                        </div>
+                        <button class="clear-profile" (click)="selectedMember = null">Cerrar</button>
+                    </div>
+                </section>
                 <!-- Host management -->
                 <section class="admin-section" *ngIf="isHost()">
                     <div class="section-head">ACCIONES DE HOST</div>
@@ -216,7 +372,7 @@
                 <section class="members-section">
                     <div class="section-head">MIEMBROS <span>{{ members.length }}</span></div>
                     <div class="member-compact-list">
-                        <div class="member-compact" *ngFor="let member of members">
+                        <div class="member-compact" *ngFor="let member of members" (click)="viewMember(member)">
                             <div class="avatar-mini">
                                 <img *ngIf="member.avatar" [src]="member.avatar" class="mini-avatar">
                                 <span *ngIf="!member.avatar">{{ member.name.charAt(0) }}</span>
@@ -225,14 +381,20 @@
                                 <span>{{ member.name }}</span>
                                 <span class="tag" *ngIf="checkIsHost(member.userId)">HOST</span>
                             </div>
-                            <button class="kick-btn"
-                                *ngIf="isHost() && member.userId !== (currentUser() ? currentUser().id : null)"
-                                (click)="kickMember(member)" title="Expulsar">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    style="width: 14px;">
-                                    <path d="M18 6L6 18M6 6l12 12" />
-                                </svg>
-                            </button>
+                            <div class="member-actions" *ngIf="isHost() && member.userId !== currentUser()?.id">
+                                <button class="action-btn small"
+                                    (click)="toggleMemberMenu(member); $event.stopPropagation()">⋮</button>
+                                <div class="member-dropdown" *ngIf="activeMemberMenu === member.userId">
+                                    <button (click)="selectPrivateRecipient(member)">Mensaje Directo</button>
+                                    <button *ngFor="let sg of subGroups"
+                                        (click)="moveToSubGroup(member.userId, sg._id || sg.id)">
+                                        Autorizar a {{ sg.name }}
+                                    </button>
+                                    <button (click)="muteMember(member)">Silenciar</button>
+                                    <button (click)="promoteToMod(member)">Moderador</button>
+                                    <button class="danger-text" (click)="kickMember(member)">Expulsar</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

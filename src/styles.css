@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  /* DARK MODE (Default) */
-  --bg-dark: #050505;
-  --bg-card: rgba(20, 20, 25, 0.7);
+  /* DARK MODE (Default - Deep Purple/Black) */
+  --bg-dark: #0a0a0c;
+  --bg-sidebar: #121216;
+  --bg-panel: rgba(20, 20, 25, 0.7);
+  --bg-input: rgba(255, 255, 255, 0.05);
   --primary: #9d4edd;
   --primary-glow: rgba(157, 78, 221, 0.4);
   --secondary: #5a189a;
@@ -16,15 +18,16 @@
 }
 
 body.light-mode {
-  /* LIGHT MODE Overrides */
-  --bg-dark: #f8fafc;
-  --bg-card: rgba(255, 255, 255, 0.85);
-  --text-main: #0f172a;
+  /* LIGHT MODE (Clean White/Lavender) */
+  --bg-dark: #f0f2f5;
+  --bg-sidebar: #ffffff;
+  --bg-panel: rgba(255, 255, 255, 0.8);
+  --bg-input: rgba(0, 0, 0, 0.05);
+  --text-main: #1a1a1e;
   --text-muted: #64748b;
   --border-glass: 1px solid rgba(0, 0, 0, 0.08);
   --primary-glow: rgba(157, 78, 221, 0.15);
-  --blob-opacity: 0.4;
-  /* Siguen presentes pero más suaves */
+  --blob-opacity: 0.3;
 }
 
 body {

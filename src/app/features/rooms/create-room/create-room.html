@@ -46,6 +46,11 @@
                     </label>
                 </div>
 
+                <div class="form-group">
+                    <label for="image">Imagen de la Sala (opcional)</label>
+                    <input type="file" id="image" name="image" (change)="onFileSelected($event)" accept="image/*">
+                </div>
+
                 <footer class="form-footer">
                     <button type="submit" class="btn-submit" [disabled]="!roomName || loading">
                         <span *ngIf="!loading">Lanzar Sala</span>

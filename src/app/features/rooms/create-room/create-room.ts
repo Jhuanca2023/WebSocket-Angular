@@ -16,18 +16,52 @@ export class CreateRoomComponent {
     description = '';
     isPrivate = false;
     loading = false;
+    selectedFile: File | null = null;
 
     private roomService = inject(RoomService);
     private router = inject(Router);
 
-    createRoom() {
+    onFileSelected(event: any) {
+        this.selectedFile = event.target.files[0];
+    }
+
+    async createRoom() {
         if (!this.roomName) return;
 
         this.loading = true;
+        let imageUrl = null;
+
+        if (this.selectedFile) {
+            // Upload image first
+            const formData = new FormData();
+            formData.append('file', this.selectedFile);
+            try {
+                const uploadResponse = await fetch('http://localhost:3000/api/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: formData
+                });
+                if (uploadResponse.ok) {
+                    const uploadData = await uploadResponse.json();
+                    imageUrl = uploadData.url;
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                console.error('Error uploading image', error);
+                alert('Error al subir la imagen');
+                this.loading = false;
+                return;
+            }
+        }
+
         const roomData = {
             name: this.roomName,
             description: this.description,
-            isPrivate: this.isPrivate
+            isPrivate: this.isPrivate,
+            imageUrl
         };
 
         this.roomService.createRoom(roomData).subscribe({
