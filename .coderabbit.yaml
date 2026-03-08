@@ -1,0 +1,38 @@
+# CodeRabbit Free Version Configuration
+language: typescript
+framework: angular
+
+# Enable AI code review (free tier)
+reviews:
+  enabled: true
+  changed_files_only: true
+
+# Include paths for analysis
+paths:
+  include:
+    - "src/**/*.ts"
+    - "src/**/*.html"
+    - "src/**/*.css"
+  exclude:
+    - "node_modules/**"
+    - "dist/**"
+    - ".git/**"
+
+# Basic rules for free tier
+rules:
+  typescript:
+    strict_types: true
+    unused_imports: true
+    console_logs: true
+  
+  angular:
+    component_structure: true
+    dependency_injection: true
+
+# Simple instructions
+instructions: |
+  Review Angular code for:
+  - TypeScript best practices
+  - Angular conventions
+  - Basic security checks
+  - Code quality issues
