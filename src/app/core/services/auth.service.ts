@@ -50,7 +50,9 @@ export class AuthService {
     logout() {
 
         // innecesario borrar todo el localStorage
-        localStorage.clear();
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
 
         this.user.set(null);
         this.isAuthenticated.set(false);
