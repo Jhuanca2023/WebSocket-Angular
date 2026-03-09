@@ -16,9 +16,11 @@ describe('App', () => {
 
   it('should render title', async () => {
     const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     const titleElement = compiled.querySelector('.logo-text');
+    expect(titleElement).toBeTruthy();
     expect(titleElement?.textContent).toContain('WEBROCKET');
   });
 });
