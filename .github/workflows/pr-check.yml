@@ -59,7 +59,7 @@ jobs:
         run: npm run build -- --configuration=production
         
       - name: Run tests
-        run: npm test -- --watch=false --browsers=ChromeHeadless --coverage
+        run: npm test -- --watch=false --coverage
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
