@@ -31,14 +31,10 @@ jobs:
         run: npm ci
         
       - name: Run CodeRabbit Review
-        uses: coderabbitai/ai-pr-review@latest
+        uses: coderabbitai/ai-pr-reviewer@latest
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           config_file: '.coderabbit.yaml'
-          debug: false
-          review_status: true
-          auto_review: true
-          summarize: true
           
       - name: Run Angular linting
         run: npm run lint
