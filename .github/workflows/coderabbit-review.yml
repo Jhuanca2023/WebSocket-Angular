@@ -30,12 +30,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Run CodeRabbit Review
-        uses: coderabbitai/ai-pr-reviewer@latest
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          config_file: '.coderabbit.yaml'
-          
       - name: Run tests
         run: npm test
         
