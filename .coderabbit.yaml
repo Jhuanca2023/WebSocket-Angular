@@ -5,9 +5,8 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-    
   path_filters:
-    include:
+    - include:
       - "src/**/*.ts"
       - "src/**/*.html"
       - "src/**/*.css"
@@ -15,13 +14,12 @@ reviews:
       - "angular.json"
       - "package.json"
       - "tsconfig.json"
-    exclude:
+    - exclude:
       - "node_modules/**"
       - "dist/**"
       - ".git/**"
       - "**/*.spec.ts"
       - "coverage/**"
-
   path_instructions: |
     Review Angular code for:
     - TypeScript best practices and type safety
@@ -34,7 +32,6 @@ reviews:
     - Error handling and logging
     - Testing coverage and quality
 
-# Chat instructions
 chat:
   auto_reply: true
   context_prompt: |
