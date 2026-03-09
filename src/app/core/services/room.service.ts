@@ -15,7 +15,7 @@ export class RoomService {
     }
 
     getRooms() {
-        return this.http.get(this.apiUrl, { headers: this.getHeaders() });
+        return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() });
     }
 
     createRoom(roomData: any) {
@@ -24,6 +24,10 @@ export class RoomService {
 
     getRoomById(id: string) {
         return this.http.get(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    }
+
+    getRoomMessages(id: string) {
+        return this.http.get(`${this.apiUrl}/${id}/messages`, { headers: this.getHeaders() });
     }
 
     updateRoom(id: string, roomData: any) {

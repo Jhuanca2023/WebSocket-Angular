@@ -214,6 +214,7 @@
     transition: all 0.3s ease;
 }
 
+
 .room-card:hover .btn-join {
     background: linear-gradient(135deg, #3fc12f, #54b51d);
     border-color: transparent;

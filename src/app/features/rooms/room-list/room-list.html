@@ -36,20 +36,19 @@
 
     <div *ngIf="loading" class="loader-container">
         <div class="loader"></div>
-    </div>
-
-    <div *ngIf="!loading && rooms.length === 0" class="empty-state">
         <p>No hay salas activas en este momento.</p>
     </div>
 
     <div class="rooms-grid">
-        <div *ngFor="let room of rooms" class="room-card" (click)="enterRoom(room)">
+        <div *ngFor="let room of paginatedRooms" class="room-card" (click)="enterRoom(room)">
             <div class="room-card-header">
+                <div class="room-image" *ngIf="room.imageUrl">
+                    <img [src]="room.imageUrl" alt="Room image">
+                </div>
                 <h3>{{ room.name }}</h3>
                 <span class="badge" [class.private]="room.isPrivate">
                     <svg *ngIf="room.isPrivate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         style="width: 12px; margin-right: 4px;">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0110 0v4" />
                     </svg>
                     <svg *ngIf="!room.isPrivate" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -68,5 +67,11 @@
                 <button class="btn-join">Unirse</button>
             </div>
         </div>
+    </div>
+
+    <div *ngIf="totalPages > 1" class="pagination">
+        <button class="btn-page" (click)="prevPage()" [disabled]="currentPage === 1">Anterior</button>
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <button class="btn-page" (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente</button>
     </div>
 </div>
