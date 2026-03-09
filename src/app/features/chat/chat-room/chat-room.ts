@@ -234,13 +234,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   muteMember(member: any) {
     alert(`Silenciando a ${member.name}...`);
     this.activeMemberMenu = null;
-    // TODO: Implement socket event for mute
   }
 
   promoteToMod(member: any) {
     alert(`Asignando moderador a ${member.name}...`);
     this.activeMemberMenu = null;
-    // TODO: Implement socket event for promotion
   }
 
   screenStream: MediaStream | null = null;
