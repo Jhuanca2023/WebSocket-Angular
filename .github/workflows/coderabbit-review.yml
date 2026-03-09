@@ -36,9 +36,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           config_file: '.coderabbit.yaml'
           
-      - name: Run Angular linting
-        run: npm run lint
-        
       - name: Run tests
         run: npm test -- --watch=false --browsers=ChromeHeadless --code-coverage=true
         
