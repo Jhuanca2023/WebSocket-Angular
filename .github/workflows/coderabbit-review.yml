@@ -37,7 +37,7 @@ jobs:
           config_file: '.coderabbit.yaml'
           
       - name: Run tests
-        run: npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        run: npm test -- --watch=false --browsers=ChromeHeadless
         
       - name: Build application
         run: npm run build -- --configuration=production
