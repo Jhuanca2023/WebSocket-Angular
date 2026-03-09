@@ -1,4 +1,4 @@
-name: CodeRabbit AI Review (Free)
+name: CodeRabbit AI Review
 
 on:
   pull_request:
@@ -6,6 +6,10 @@ on:
     branches:
       - main
       - dev
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   coderabbit-review:
@@ -26,8 +30,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Run CodeRabbit Review (Free)
-        uses: coderabbitai/ai-pr-reviewer@latest
+      - name: Run CodeRabbit Review
+        uses: coderabbitai/ai-pr-review@latest
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           config_file: '.coderabbit.yaml'
+          debug: false
+          review_status: true
+          auto_review: true
+          summarize: true
+          
+      - name: Run Angular linting
+        run: npm run lint
+        
+      - name: Run tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless --code-coverage=true
+        
+      - name: Build application
+        run: npm run build -- --configuration=production

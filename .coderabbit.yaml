@@ -1,19 +1,66 @@
-# CodeRabbit Free Version Configuration
+# CodeRabbit Configuration for Angular Frontend
+language: typescript
+framework: angular
+
 reviews:
   enabled: true
   changed_files_only: true
+  auto_review:
+    enabled: true
+    drafts: false
+    
   path_filters:
     include:
       - "src/**/*.ts"
       - "src/**/*.html"
       - "src/**/*.css"
+      - "src/**/*.scss"
+      - "angular.json"
+      - "package.json"
+      - "tsconfig.json"
     exclude:
       - "node_modules/**"
       - "dist/**"
       - ".git/**"
+      - "**/*.spec.ts"
+      - "coverage/**"
+
   path_instructions: |
     Review Angular code for:
-    - TypeScript best practices
-    - Angular conventions
-    - Basic security checks
-    - Code quality issues
+    - TypeScript best practices and type safety
+    - Angular conventions (components, services, modules)
+    - Reactive forms and RxJS patterns
+    - Performance optimization
+    - Security best practices (XSS prevention, sanitization)
+    - Accessibility (ARIA labels, semantic HTML)
+    - Code organization and maintainability
+    - Error handling and logging
+    - Testing coverage and quality
+
+  # Specific rules for frontend
+  rules:
+    - type: "security"
+      enabled: true
+      severity: "high"
+    - type: "performance"
+      enabled: true
+      severity: "medium"
+    - type: "accessibility"
+      enabled: true
+      severity: "medium"
+
+# Chat instructions
+chat:
+  auto_reply: true
+  context_prompt: |
+    You are reviewing an Angular frontend application. 
+    Focus on Angular best practices, TypeScript type safety, 
+    component architecture, and user experience.
+
+# Summaries
+summaries:
+  enabled: true
+  types:
+    - "overview"
+    - "changes"
+    - "recommendations"
